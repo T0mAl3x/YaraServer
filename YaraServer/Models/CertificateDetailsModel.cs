@@ -28,5 +28,7 @@ namespace YaraServer.Models
         public string PublicKeyFormat { get; set; }
         [Display(Name = "Raw Data Length")]
         public string RawDataLength { get; set; }
+        public bool IsRevoked { get; set; }
+
     }
 }

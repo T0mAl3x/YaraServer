@@ -93,7 +93,8 @@ namespace YaraServer.Areas.Admin.Controllers
                         SerialNumber = clientCertificate.SerialNumber,
                         FriendlyName = clientCertificate.FriendlyName,
                         PublicKeyFormat = clientCertificate.PublicKey.EncodedKeyValue.Format(true),
-                        RawDataLength = clientCertificate.RawData.Length.ToString()
+                        RawDataLength = clientCertificate.RawData.Length.ToString(),
+                        IsRevoked = false
                     };
                     _db.Certificates.Add(certificateDetailsModelToDB);
                     await _db.SaveChangesAsync();
@@ -108,11 +109,89 @@ namespace YaraServer.Areas.Admin.Controllers
         }
 
         // GET - DETAILS
-        public async Task<IActionResult> Details(int Id)
+        public async Task<IActionResult> Details(int? Id)
         {
-            CertificateDetailsModel certificateDetailsModel = await _db.Certificates.FirstOrDefaultAsync(m => m.Id == Id);
+            if (Id == null)
+            {
+                return NotFound();
+            }
+
+            CertificateDetailsModel certificateDetailsModel = await _db.Certificates.SingleOrDefaultAsync(m => m.Id == Id);
+
+            if (certificateDetailsModel == null)
+            {
+                return NotFound();
+            }
 
             return PartialView("_IndividualCertificateDetails", certificateDetailsModel);
+        }
+
+        // GET - REVOKE
+        public async Task<IActionResult> Revoke(int? Id)
+        {
+            if (Id == null)
+            {
+                return NotFound();
+            }
+
+            CertificateDetailsModel certificateDetailsModel = await _db.Certificates.SingleOrDefaultAsync(m => m.Id == Id);
+
+            if (certificateDetailsModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(new RevokeCertificateViewModel() { Certificate = certificateDetailsModel});
+        }
+
+        // POST - REVOKE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Revoke(RevokeCertificateViewModel revokeCertificateViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                revokeCertificateViewModel.ErrorMessage = null;
+                try
+                {
+                    string webRootPath = _hostingEnvironment.WebRootPath;
+
+                    // Get CA
+                    var CACert = Path.Combine(webRootPath, "certificates", "YaraCA.pfx");
+                    X509Certificate2 CA = new X509Certificate2(CACert, revokeCertificateViewModel.CAPassword,
+                        X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
+
+                    // Generate client certificate
+                    string pathToClientCerts = Path.Combine(webRootPath, "certificates", "clients");
+                    string subject = revokeCertificateViewModel.Certificate.Subject.Substring(3);
+                    X509Certificate2 clientCertificate = new X509Certificate2(Path.Combine(pathToClientCerts, $"{subject}.cer"));
+
+                    string pathToCrls = Path.Combine(webRootPath, "certificates", "crls");
+                    _certHandler.RevokeCertificate(clientCertificate, CA, pathToCrls);
+
+                    System.IO.File.Delete(Path.Combine(pathToClientCerts, $"{subject}.cer"));
+
+                    var certFromDb = await _db.Certificates.FindAsync(revokeCertificateViewModel.Certificate.Id);
+                    certFromDb.IsRevoked = true;
+                    await _db.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    revokeCertificateViewModel.ErrorMessage = ex.Message;
+                    return View(revokeCertificateViewModel);
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET - Download Certificate
+        public IActionResult Download(string subjectName)
+        {
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            string pathToClientCerts = Path.Combine(webRootPath, "certificates", "clients");
+            var subject = subjectName.Substring(3);
+            var file = Path.Combine(pathToClientCerts, $"{subject}.cer");
+            return File(System.IO.File.ReadAllBytes(file), "application/octet-stream", $"{subject}.cer");
         }
     }
 }

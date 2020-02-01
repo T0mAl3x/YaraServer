@@ -31,24 +31,84 @@
                         @Html.DisplayNameFor(m => m.Certificates[0].ExpiryDate)
                     </th>
                     <th></th>
-                    <th></th>
                 </tr>
                 @foreach (var item in Model.Certificates)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(m => item.Subject)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(m => item.ValidDate)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(m => item.ExpiryDate)
-                        </td>
-                        <td>
-                            <partial name="_TableButtonPartial" model="item.Id" />
-                        </td>
-                    </tr>
+                    @if (item.IsRevoked || item.ExpiryDate <= DateTime.Now)
+                    {
+                        <tr class="table-danger">
+                            <td>
+                                @Html.DisplayFor(m => item.Subject)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ValidDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ExpiryDate)
+                            </td>
+                            <td style="width:150px">
+                                <div class="btn-group" role="group">
+                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
+                                        <i class="far fa-list-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else if (item.ValidDate > DateTime.Now)
+                    {
+                        <tr class="table-primary">
+                            <td>
+                                @Html.DisplayFor(m => item.Subject)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ValidDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ExpiryDate)
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a class="btn btn-primary text-white" asp-action="Download" asp-route-subjectName="@item.Subject">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
+                                        <i class="far fa-list-alt"></i>
+                                    </button>
+                                    <a class="btn btn-danger text-white" asp-action="Revoke" asp-route-Id="@item.Id">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(m => item.Subject)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ValidDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.ExpiryDate)
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a class="btn btn-primary text-white" asp-action="Download" asp-route-subjectName="@item.Subject">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
+                                        <i class="far fa-list-alt"></i>
+                                    </button>
+                                    <a class="btn btn-danger text-white" asp-action="Revoke" asp-route-Id="@item.Id">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 }
             </table>
         }
