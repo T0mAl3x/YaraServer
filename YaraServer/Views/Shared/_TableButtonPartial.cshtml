@@ -1,0 +1,15 @@
+﻿@model int
+
+<td style="width:150px">
+    <div class="btn-group" role="group">
+        <a class="btn btn-primary text-white" asp-action="Download" asp-route-Id="@Model">
+            <i class="fas fa-download"></i>
+        </a>
+        <button type="submit" class="btn btn-success anchorDetail" data-id="@Model" data-toggle="modal">
+            <i class="far fa-list-alt"></i>
+        </button>
+        <a class="btn btn-danger text-white" asp-action="Revoke" asp-route-Id="@Model">
+            <i class="fas fa-trash-alt"></i>
+        </a>
+    </div>
+</td>

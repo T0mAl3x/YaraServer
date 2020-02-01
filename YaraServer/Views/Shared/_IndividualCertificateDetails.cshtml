@@ -1,0 +1,94 @@
+﻿@model CertificateDetailsModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="container row border ml-1 backgroundWhiteBorder10Padding" style="width:100%">
+    <div class="col-lg-8 col-12" style="border-right:1px solid #bbb9b9">
+        <br />
+        <div class="form-group row">
+            <div class="col-3">
+                <label>Subject</label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Subject" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="Issuer"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Issuer" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="Version"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Version" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="ValidDate"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="ValidDate" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="ExpiryDate"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="ExpiryDate" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="Thumbprint"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Thumbprint" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="SerialNumber"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="SerialNumber" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="FriendlyName"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="FriendlyName" disabled class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="RawDataLength"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="RawDataLength" disabled class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-12">
+        <h4 class="d-flex justify-content-between align-content-center mb-3">
+            <span class="text-muted">Public Key Format: </span>
+        </h4>
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between" style="height:500px">
+                <textarea asp-for="PublicKeyFormat" disabled="disabled"></textarea>
+            </li>
+        </ul>
+    </div>
+
+</div>

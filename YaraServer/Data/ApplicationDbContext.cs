@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using YaraServer.Models;
 
 namespace YaraServer.Data
 {
@@ -12,5 +13,7 @@ namespace YaraServer.Data
             : base(options)
         {
         }
+
+        public DbSet<CertificateDetailsModel> Certificates { get; set; }
     }
 }
