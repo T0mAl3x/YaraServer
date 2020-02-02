@@ -10,7 +10,6 @@ namespace YaraServer.Models
     {
         [Key]
         public int Id { get; set; }
-
         public string Subject { get; set; }
         public string Issuer { get; set; }
         public string Version { get; set; }
@@ -29,6 +28,5 @@ namespace YaraServer.Models
         [Display(Name = "Raw Data Length")]
         public string RawDataLength { get; set; }
         public bool IsRevoked { get; set; }
-
     }
 }

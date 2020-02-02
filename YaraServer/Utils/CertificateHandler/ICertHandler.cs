@@ -15,5 +15,6 @@ namespace YaraServer.Utils.CertificateHandler
             DateTime notBefore, DateTime notAfter);
         ValidityConstants VerifyCertificate(X509Certificate2 client, X509Certificate2 authority, string crlPath);
         void RevokeCertificate(X509Certificate2 x509Certificate2, X509Certificate2 authority, string pathToCrls);
+        byte[] StringToByteArray(string hex);
     }
 }

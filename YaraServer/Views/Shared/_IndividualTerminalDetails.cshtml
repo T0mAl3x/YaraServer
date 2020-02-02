@@ -1,4 +1,4 @@
-﻿@model CertificateDetailsModel
+﻿@model TerminalDetailsModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -8,18 +8,18 @@
         <br />
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="Subject"></label>
+                <label asp-for="SystemName"></label>
             </div>
             <div class="col-9">
-                <input asp-for="Subject" disabled class="form-control" />
+                <input asp-for="SystemName" disabled class="form-control" />
             </div>
         </div>
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="Issuer"></label>
+                <label asp-for="OsName"></label>
             </div>
             <div class="col-9">
-                <input asp-for="Issuer" disabled class="form-control" />
+                <input asp-for="OsName" disabled class="form-control" />
             </div>
         </div>
         <div class="form-group row">
@@ -32,61 +32,60 @@
         </div>
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="ValidDate"></label>
+                <label asp-for="MAC"></label>
             </div>
             <div class="col-9">
-                <input asp-for="ValidDate" disabled class="form-control" />
+                <input asp-for="MAC" disabled class="form-control" />
             </div>
         </div>
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="ExpiryDate"></label>
+                <label asp-for="Processor"></label>
             </div>
             <div class="col-9">
-                <input asp-for="ExpiryDate" disabled class="form-control" />
+                <input asp-for="Processor" disabled class="form-control" />
             </div>
         </div>
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="Thumbprint"></label>
+                <label asp-for="Motherboard"></label>
             </div>
             <div class="col-9">
-                <input asp-for="Thumbprint" disabled class="form-control" />
+                <input asp-for="Motherboard" disabled class="form-control" />
             </div>
         </div>
         <div class="form-group row">
             <div class="col-3">
-                <label asp-for="SerialNumber"></label>
+                <label asp-for="RAM"></label>
             </div>
             <div class="col-9">
-                <input asp-for="SerialNumber" disabled class="form-control" />
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-3">
-                <label asp-for="FriendlyName"></label>
-            </div>
-            <div class="col-9">
-                <input asp-for="FriendlyName" disabled class="form-control" />
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-3">
-                <label asp-for="RawDataLength"></label>
-            </div>
-            <div class="col-9">
-                <input asp-for="RawDataLength" disabled class="form-control" />
+                <input asp-for="RAM" disabled class="form-control" />
             </div>
         </div>
     </div>
 
     <div class="col-lg-4 col-12">
         <h4 class="d-flex justify-content-between align-content-center mb-3">
-            <span class="text-muted">Public Key Format:</span>
+            <span class="text-muted">Corresponding Certificate:</span>
         </h4>
         <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between" style="height:500px">
-                <textarea asp-for="PublicKeyFormat" disabled="disabled"></textarea>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <h6 class="my-0">@Model.Certificate.Subject.Substring(3)</h6>
+                    <small class="text-muted">Subject Name</small>
+                </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <h6 class="my-0">@Model.Certificate.ValidDate</h6>
+                    <small class="text-muted">Valid From</small>
+                </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <h6 class="my-0">@Model.Certificate.ExpiryDate</h6>
+                    <small class="text-muted">Until</small>
+                </div>
             </li>
         </ul>
     </div>

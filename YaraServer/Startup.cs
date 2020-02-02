@@ -65,6 +65,9 @@ namespace YaraServer
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "agent",
+                    pattern: "{controller=Agent}/{action=Enroll}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

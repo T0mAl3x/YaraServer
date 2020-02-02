@@ -1,4 +1,4 @@
-﻿@model YaraServer.Models.ViewModels.CertificatesViewModel
+﻿@model YaraServer.Models.ViewModels.TerminalsViewModel
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,42 +9,39 @@
 <div class="border backgroundWhite">
     <div class="row">
         <div class="col-6">
-            <h2 class="text-info">Client Certificates</h2>
-        </div>
-        <div class="col-6 text-right">
-            <partial name="_CreateButtonPartial" />
+            <h2 class="text-info">Terminals</h2>
         </div>
     </div>
     <br />
     <div>
-        @if (Model.Certificates.Count() > 0)
+        @if (Model.Terminals.Count() > 0)
         {
             <table class="table table-striped border">
                 <tr class="table-secondary">
                     <th>
-                        @Html.DisplayNameFor(m => m.Certificates[0].Subject)
+                        @Html.DisplayNameFor(m => m.Terminals[0].SystemName)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(m => m.Certificates[0].ValidDate)
+                        @Html.DisplayNameFor(m => m.Terminals[0].OsName)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(m => m.Certificates[0].ExpiryDate)
+                        @Html.DisplayNameFor(m => m.Terminals[0].MAC)
                     </th>
                     <th></th>
                 </tr>
-                @foreach (var item in Model.Certificates)
+                @foreach (var item in Model.Terminals)
                 {
-                    @if (item.IsRevoked || item.ExpiryDate <= DateTime.Now)
+                    @if (item.Certificate.IsRevoked || item.Certificate.ExpiryDate <= DateTime.Now)
                     {
                         <tr class="table-danger">
                             <td>
-                                @Html.DisplayFor(m => item.Subject)
+                                @Html.DisplayFor(m => item.SystemName)
                             </td>
                             <td>
-                                @Html.DisplayFor(m => item.ValidDate)
+                                @Html.DisplayFor(m => item.OsName)
                             </td>
                             <td>
-                                @Html.DisplayFor(m => item.ExpiryDate)
+                                @Html.DisplayFor(m => item.MAC)
                             </td>
                             <td style="width:150px">
                                 <div class="btn-group" role="group">
@@ -55,52 +52,25 @@
                             </td>
                         </tr>
                     }
-                    else if (item.ValidDate > DateTime.Now)
-                    {
-                        <tr class="table-primary">
-                            <td>
-                                @Html.DisplayFor(m => item.Subject)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.ValidDate)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.ExpiryDate)
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
-                                        <i class="far fa-list-alt"></i>
-                                    </button>
-                                    <a class="btn btn-danger text-white" asp-action="Revoke" asp-route-Id="@item.Id">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
                     else
                     {
                         <tr>
                             <td>
-                                @Html.DisplayFor(m => item.Subject)
+                                @Html.DisplayFor(m => item.SystemName)
                             </td>
                             <td>
-                                @Html.DisplayFor(m => item.ValidDate)
+                                @Html.DisplayFor(m => item.OsName)
                             </td>
                             <td>
-                                @Html.DisplayFor(m => item.ExpiryDate)
+                                @Html.DisplayFor(m => item.MAC)
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a class="btn btn-primary text-white" asp-action="Download" asp-route-subjectName="@item.Subject">
-                                        <i class="fas fa-download"></i>
-                                    </a>
                                     <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
-                                        <i class="far fa-list-alt"></i>
+                                        <i class="far fa-list-alt"></i> Details 
                                     </button>
-                                    <a class="btn btn-danger text-white" asp-action="Revoke" asp-route-Id="@item.Id">
-                                        <i class="fas fa-trash-alt"></i>
+                                    <a class="btn btn-info text-white" asp-action="Reports" asp-route-Id="@item.Id">
+                                        <i class="fas fa-flag-checkered"></i> Reports
                                     </a>
                                 </div>
                             </td>
@@ -111,7 +81,7 @@
         }
         else
         {
-            <p>No certificates exist...</p>
+            <p>No terminals registered...</p>
         }
     </div>
 </div>
@@ -134,7 +104,7 @@
 @section scripts
     {
     <script>
-        var PostBackURL = '/Admin/Cert/Details';
+        var PostBackURL = '/Admin/Terminal/Details';
 
         $(function () {
             $(".anchorDetail").click(function () {
