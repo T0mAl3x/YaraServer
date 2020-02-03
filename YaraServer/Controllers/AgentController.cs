@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using YaraServer.Data;
 using YaraServer.Models;
+using YaraServer.Models.Network;
 using YaraServer.Utils.CertificateHandler;
 
 namespace YaraServer.Controllers
@@ -88,7 +89,7 @@ namespace YaraServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Report([FromBody] TerminalDetailsModel terminalDetailsModel)
+        public async Task<IActionResult> Report([FromBody] InfoModel infoModel)
         {
             // Get client certificate
             string clientCertFromHeader = Request.Headers["X-ARR-ClientCert"];
@@ -116,6 +117,90 @@ namespace YaraServer.Controllers
             // Save Report to DB
             if (ModelState.IsValid)
             {
+                var client = await _db.Terminals.Include(s => s.Certificate).SingleOrDefaultAsync(m => m.Certificate.Subject == clientCertificate.Subject);
+                if (client == null)
+                {
+                    return BadRequest();
+                }
+
+                int tagToDb = 0;
+                switch(infoModel.ReportTag)
+                {
+                    case Tag.OK:
+                        tagToDb = 0;
+                        break;
+                    case Tag.WARNING:
+                        tagToDb = 1;
+                        break;
+                    case Tag.DANGER:
+                        tagToDb = 2;
+                        break;
+                }
+
+                // Adding Report
+                ReportModel reportModel = new ReportModel()
+                {
+                    ScanId = infoModel.ScandId,
+                    Date = infoModel.Date,
+                    SHA1 = infoModel.SHA1,
+                    SHA256 = infoModel.SHA256,
+                    FilePath = infoModel.FilePath,
+                    Positives = infoModel.Positives,
+                    Total = infoModel.Total,
+                    Tag = tagToDb,
+                    TerminalId = client.Id
+                };
+                _db.Reports.Add(reportModel);
+
+                // Adding Scans
+                foreach (var scan in infoModel.Scans)
+                {
+                    ScanModel scanModel = new ScanModel()
+                    {
+                        EngineName = scan.EngineName,
+                        Detected = scan.Detected,
+                        Version = scan.Version,
+                        Result = scan.Result,
+                        Report = reportModel
+                    };
+                    _db.Scans.Add(scanModel);
+                }
+
+                // Adding Messages
+                foreach (var message in infoModel.Messages)
+                {
+                    MessageModel messageModel = new MessageModel()
+                    {
+                        Message = message,
+                        Report = reportModel
+                    };
+                    _db.Messages.Add(messageModel);
+                }
+
+                // Adding YaraResults
+                foreach (var yaraResult in infoModel.YaraResults)
+                {
+                    YaraResultModel yaraResultModel = new YaraResultModel()
+                    {
+                        Identifier = yaraResult.Identifier,
+                        Report = reportModel
+                    };
+                    _db.YaraResults.Add(yaraResultModel);
+
+                    // Adding YaraMetas
+                    foreach (var yaraMeta in yaraResult.Meta)
+                    {
+                        YaraMetaModel yaraMetaModel = new YaraMetaModel()
+                        {
+                            MetaKey = yaraMeta.Key,
+                            MetaValue = yaraMeta.Value,
+                            YaraResult = yaraResultModel
+                        };
+                        _db.YaraMetas.Add(yaraMetaModel);
+                    }
+                }
+                await _db.SaveChangesAsync();
+
                 return Ok();
             }
 

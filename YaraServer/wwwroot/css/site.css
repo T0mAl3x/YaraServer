@@ -88,3 +88,10 @@ body {
     border-radius: 10px;
     border: 1px solid #ddd;
 }
+
+.list-group {
+    max-height: 500px;
+    margin-bottom: 10px;
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+}

@@ -16,5 +16,10 @@ namespace YaraServer.Data
 
         public DbSet<CertificateDetailsModel> Certificates { get; set; }
         public DbSet<TerminalDetailsModel> Terminals { get; set; }
+        public DbSet<ReportModel> Reports { get; set; }
+        public DbSet<ScanModel> Scans { get; set; }
+        public DbSet<YaraResultModel> YaraResults { get; set; }
+        public DbSet<MessageModel> Messages { get; set; }
+        public DbSet<YaraMetaModel> YaraMetas { get; set; }
     }
 }

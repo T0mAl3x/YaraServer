@@ -1,0 +1,73 @@
+﻿@model YaraServer.Models.ViewModels.ReportsViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<br />
+<div class="border backgroundWhite">
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-info">Reports</h2>
+        </div>
+    </div>
+    <br />
+    <div>
+        @if (Model.Reports.Count() > 0)
+        {
+            <table class="table table-striped border">
+                <tr class="table-secondary">
+                    <th>
+                        @Html.DisplayNameFor(m => m.Reports[0].FilePath)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Reports[0].Terminal.SystemName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Reports[0].Date)
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.Reports)
+                {
+                    string tagClass = "table-danger";
+                    switch (item.Tag)
+                    {
+                        case 2:
+                            tagClass = "table-danger";
+                            break;
+                        case 1:
+                            tagClass = "table-warning";
+                            break;
+                        case 0:
+                            tagClass = "";
+                            break;
+                    }
+                    <tr class=@tagClass>
+                        <td>
+                            @Html.DisplayFor(m => item.FilePath)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Terminal.SystemName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Date)
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-info text-white" asp-action="Details" asp-route-Id="@item.Id">
+                                    <i class="far fa-list-alt"></i> Details
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>No reports registered...</p>
+        }
+    </div>
+</div>

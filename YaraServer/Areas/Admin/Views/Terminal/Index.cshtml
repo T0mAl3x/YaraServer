@@ -31,51 +31,32 @@
                 </tr>
                 @foreach (var item in Model.Terminals)
                 {
+                    string tagClass = "";
                     @if (item.Certificate.IsRevoked || item.Certificate.ExpiryDate <= DateTime.Now)
                     {
-                        <tr class="table-danger">
-                            <td>
-                                @Html.DisplayFor(m => item.SystemName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.OsName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.MAC)
-                            </td>
-                            <td style="width:150px">
-                                <div class="btn-group" role="group">
-                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
-                                        <i class="far fa-list-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        tagClass = "table-danger";
                     }
-                    else
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(m => item.SystemName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.OsName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.MAC)
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
-                                        <i class="far fa-list-alt"></i> Details 
-                                    </button>
-                                    <a class="btn btn-info text-white" asp-action="Reports" asp-route-Id="@item.Id">
-                                        <i class="fas fa-flag-checkered"></i> Reports
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                    <tr class=@tagClass>
+                        <td>
+                            @Html.DisplayFor(m => item.SystemName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OsName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.MAC)
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="submit" class="btn btn-success anchorDetail" data-id="@item.Id" data-toggle="modal">
+                                    <i class="far fa-list-alt"></i>
+                                </button>
+                                <a class="btn btn-info text-white" asp-area="Admin" asp-controller="Report" asp-action="Index" asp-route-Id="@item.Id">
+                                    <i class="fas fa-flag-checkered"></i> Reports
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
                 }
             </table>
         }
@@ -90,7 +71,7 @@
     <div class="modal-dialog-centered modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-success text-light justify-content-center">
-                <h5 class="modal-title">Order Details</h5>
+                <h5 class="modal-title">Terminal Details</h5>
             </div>
             <div class="modal-body justify-content-center" id="myModalContent">
             </div>

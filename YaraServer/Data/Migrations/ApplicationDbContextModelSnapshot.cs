@@ -264,6 +264,96 @@ namespace YaraServer.Data.Migrations
                     b.ToTable("Certificates");
                 });
 
+            modelBuilder.Entity("YaraServer.Models.MessageModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("YaraServer.Models.ReportModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Positives")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SHA1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SHA256")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScanId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tag")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TerminalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TerminalId");
+
+                    b.ToTable("Reports");
+                });
+
+            modelBuilder.Entity("YaraServer.Models.ScanModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Detected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("EngineName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Version")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("Scans");
+                });
+
             modelBuilder.Entity("YaraServer.Models.TerminalDetailsModel", b =>
                 {
                     b.Property<int>("Id")
@@ -300,6 +390,49 @@ namespace YaraServer.Data.Migrations
                     b.HasIndex("CertificateId");
 
                     b.ToTable("Terminals");
+                });
+
+            modelBuilder.Entity("YaraServer.Models.YaraMetaModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("MetaKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("YaraResultId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("YaraResultId");
+
+                    b.ToTable("YaraMetas");
+                });
+
+            modelBuilder.Entity("YaraServer.Models.YaraResultModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Identifier")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("YaraResults");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -353,11 +486,56 @@ namespace YaraServer.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("YaraServer.Models.MessageModel", b =>
+                {
+                    b.HasOne("YaraServer.Models.ReportModel", "Report")
+                        .WithMany()
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("YaraServer.Models.ReportModel", b =>
+                {
+                    b.HasOne("YaraServer.Models.TerminalDetailsModel", "Terminal")
+                        .WithMany()
+                        .HasForeignKey("TerminalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("YaraServer.Models.ScanModel", b =>
+                {
+                    b.HasOne("YaraServer.Models.ReportModel", "Report")
+                        .WithMany()
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("YaraServer.Models.TerminalDetailsModel", b =>
                 {
                     b.HasOne("YaraServer.Models.CertificateDetailsModel", "Certificate")
                         .WithMany()
                         .HasForeignKey("CertificateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("YaraServer.Models.YaraMetaModel", b =>
+                {
+                    b.HasOne("YaraServer.Models.YaraResultModel", "YaraResult")
+                        .WithMany()
+                        .HasForeignKey("YaraResultId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("YaraServer.Models.YaraResultModel", b =>
+                {
+                    b.HasOne("YaraServer.Models.ReportModel", "Report")
+                        .WithMany()
+                        .HasForeignKey("ReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
