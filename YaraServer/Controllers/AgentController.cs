@@ -58,7 +58,7 @@ namespace YaraServer.Controllers
             if (ModelState.IsValid)
             {
                 // Check if client already enrolled
-                var client = await _db.Terminals.Include(s => s.Certificate).SingleOrDefaultAsync(m => m.Certificate.Subject == clientCertificate.Subject);
+                var client = await _db.Terminals.Include(s => s.Certificate).SingleOrDefaultAsync(m => m.MAC == terminalDetailsModel.MAC);
                 if (client == null)
                 {
                     // Enroll client
@@ -79,6 +79,12 @@ namespace YaraServer.Controllers
                         CertificateId = certificate.Id
                     };
                     _db.Terminals.Add(clientToDb);
+                    await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    var certificate = await _db.Certificates.SingleOrDefaultAsync(m => m.Subject == clientCertificate.Subject);
+                    client.Certificate = certificate;
                     await _db.SaveChangesAsync();
                 }
 
@@ -153,18 +159,26 @@ namespace YaraServer.Controllers
                 _db.Reports.Add(reportModel);
 
                 // Adding Scans
-                foreach (var scan in infoModel.Scans)
+                try
                 {
-                    ScanModel scanModel = new ScanModel()
+                    foreach (var scan in infoModel.Scans)
                     {
-                        EngineName = scan.EngineName,
-                        Detected = scan.Detected,
-                        Version = scan.Version,
-                        Result = scan.Result,
-                        Report = reportModel
-                    };
-                    _db.Scans.Add(scanModel);
+                        ScanModel scanModel = new ScanModel()
+                        {
+                            EngineName = scan.EngineName,
+                            Detected = scan.Detected,
+                            Version = scan.Version,
+                            Result = scan.Result,
+                            Report = reportModel
+                        };
+                        _db.Scans.Add(scanModel);
+                    }
                 }
+                catch (Exception ex)
+                {
+
+                }
+                
 
                 // Adding Messages
                 foreach (var message in infoModel.Messages)

@@ -1,8 +1,294 @@
-﻿@{
+﻿@model YaraServer.Models.ViewModels.HomeViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@inject IJsonHelper Json;
+<br />
+<br />
+<div class="row">
+    <div class="col-6">
+        <h4 class="d-flex justify-content-between align-content-center mb-3">
+            <span class="text-info"><i class="far fa-chart-bar"></i> Statistics</span>
+        </h4>
+    </div>
 </div>
+<div class="border backgroundWhite">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="d-flex justify-content-between align-content-center mb-3">
+                <span class="text-primary">Overview</span>
+            </h6>
+            <br />
+            <div class="form-group row">
+                <div class="col-2">
+                    <label asp-for="TotalScans"></label>
+                </div>
+                <div class="col-2">
+                    <input asp-for="TotalScans" disabled class="form-control" />
+                </div>
+                <div class="col-2">
+                    <label asp-for="TotalPotentialInfected"></label>
+                </div>
+                <div class="col-2">
+                    <input asp-for="TotalPotentialInfected" disabled class="form-control" />
+                </div>
+                <div class="col-2">
+                    <label asp-for="TotalTerminals"></label>
+                </div>
+                <div class="col-2">
+                    <input asp-for="TotalTerminals" disabled class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h6 class="d-flex justify-content-between align-content-center mb-3">
+                <span class="text-primary">Top Yara Matches:</span>
+            </h6>
+            <br />
+            @if (Model.YaraResults.Count() > 0)
+            {
+                <div id="topYaraMatches" style="min-height:350px"></div>
+            }
+            else
+            {
+                <p>Not data to show...</p>
+            }
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12">
+            <h6 class="d-flex justify-content-between align-content-center mb-3">
+                <span class="text-primary">Top Yara Matches:</span>
+            </h6>
+            <br />
+            @if (Model.YaraResults.Count() > 0)
+            {
+                <div id="totalScans" style="min-height:350px"></div>
+            }
+            else
+            {
+                <p>Not data to show...</p>
+            }
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12">
+            <h6 class="d-flex justify-content-between align-content-center mb-3">
+                <span class="text-primary">Potential Malware Detections:</span>
+            </h6>
+            <br />
+            @if (Model.Reports.Count() > 0)
+            {
+                <div id="potentialDetections" style="min-height:400px"></div>
+            }
+            else
+            {
+                <p>Not data to show...</p>
+            }
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12">
+            <h6 class="d-flex justify-content-between align-content-center mb-3">
+                <span class="text-primary">Scans per day:</span>
+            </h6>
+            <br />
+            @if (Model.Reports.Count() > 0)
+            {
+                <div id="scansPerDay" style="min-height:400px"></div>
+            }
+            else
+            {
+                <p>Not data to show...</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- Resources -->
+    <script src="~/js/amcharts4/core.js"></script>
+    <script src="~/js/amcharts4/charts.js"></script>
+    <script src="~/js/amcharts4/themes/animated.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var yaras = @Html.Raw(Json.Serialize(Model.YaraResults));
+            if (yaras.length > 0)
+                BuildYaraMatches(yaras);
+
+            var scans = @Html.Raw(Json.Serialize(Model.Scans));
+            if (yaras.length > 0)
+                BuildScans(scans);
+
+            var detections = @Html.Raw(Json.Serialize(Model.Reports));
+            if (detections.length > 0)
+                BuildPotentialDetections(detections);
+
+            var scansPerDay = @Html.Raw(Json.Serialize(Model.ScansPerDay));
+            if (scansPerDay.length > 0)
+                BuildTotalScans(scansPerDay);
+        });
+
+        function BuildYaraMatches(model) {
+            am4core.ready(function () {
+                console.log(model);
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            var chart = am4core.create("topYaraMatches", am4charts.PieChart3D);
+            chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+            chart.legend = new am4charts.Legend();
+
+            chart.data = model;
+
+            chart.innerRadius = 50;
+
+            var series = chart.series.push(new am4charts.PieSeries3D());
+            series.dataFields.value = "count";
+            series.dataFields.category = "key";
+
+            }); // end am4core.ready()
+        };
+
+        function BuildScans(model) {
+            am4core.ready(function () {
+                console.log(model);
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            var chart = am4core.create("totalScans", am4charts.PieChart3D);
+            chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+            chart.legend = new am4charts.Legend();
+
+            chart.data = model;
+
+            chart.innerRadius = 50;
+
+            var series = chart.series.push(new am4charts.PieSeries3D());
+            series.dataFields.value = "count";
+            series.dataFields.category = "key";
+
+            }); // end am4core.ready()
+        };
+
+        function BuildPotentialDetections(model) {
+            am4core.ready(function () {
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+
+                // Create chart
+                var chart = am4core.create("potentialDetections", am4charts.XYChart);
+                chart.paddingRight = 20;
+
+                chart.data = generateChartData(model);
+
+                var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                dateAxis.baseInterval = {
+                    "timeUnit": "day",
+                    "count": 1
+                };
+                dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
+
+                var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                valueAxis.tooltip.disabled = true;
+                valueAxis.title.text = "Potential malware";
+
+                var series = chart.series.push(new am4charts.LineSeries());
+                series.dataFields.dateX = "key";
+                series.dataFields.valueY = "count";
+                series.tooltipText = "Count: [bold]{valueY}[/]";
+                series.fillOpacity = 0.3;
+
+
+                chart.cursor = new am4charts.XYCursor();
+                chart.cursor.lineY.opacity = 0;
+                chart.scrollbarX = new am4charts.XYChartScrollbar();
+                chart.scrollbarX.series.push(series);
+
+
+                dateAxis.start = 0.8;
+                dateAxis.keepSelection = true;
+
+                function generateChartData(model) {
+                    var chartData = [];
+
+                    for (var i = 0; i < model.length; i++) {
+                        chartData.push({
+                            key: Date.parse(model[i].key.replace(/-/g, "/")),
+                            count: model[i].count
+                        });
+                    }
+                    return chartData;
+                }
+
+            }); // end am4core.ready()
+        };
+
+        function BuildTotalScans(model) {
+            am4core.ready(function () {
+
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+
+                // Create chart instance
+                var chart = am4core.create("scansPerDay", am4charts.XYChart3D);
+
+                // Add data
+                chart.data = model;
+
+                // Create axes
+                let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                categoryAxis.dataFields.category = "key";
+                categoryAxis.renderer.labels.template.rotation = 270;
+                categoryAxis.renderer.labels.template.hideOversized = false;
+                categoryAxis.renderer.minGridDistance = 20;
+                categoryAxis.renderer.labels.template.horizontalCenter = "right";
+                categoryAxis.renderer.labels.template.verticalCenter = "middle";
+                categoryAxis.tooltip.label.rotation = 270;
+                categoryAxis.tooltip.label.horizontalCenter = "right";
+                categoryAxis.tooltip.label.verticalCenter = "middle";
+
+                let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                valueAxis.title.fontWeight = "bold";
+
+                // Create series
+                var series = chart.series.push(new am4charts.ColumnSeries3D());
+                series.dataFields.valueY = "count";
+                series.dataFields.categoryX = "key";
+                series.name = "Scans";
+                series.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+                series.columns.template.fillOpacity = .8;
+
+                var columnTemplate = series.columns.template;
+                columnTemplate.strokeWidth = 2;
+                columnTemplate.strokeOpacity = 1;
+                columnTemplate.stroke = am4core.color("#FFFFFF");
+
+                columnTemplate.adapter.add("fill", function (fill, target) {
+                    return chart.colors.getIndex(target.dataItem.index);
+                })
+
+                columnTemplate.adapter.add("stroke", function (stroke, target) {
+                    return chart.colors.getIndex(target.dataItem.index);
+                })
+
+                chart.cursor = new am4charts.XYCursor();
+                chart.cursor.lineX.strokeOpacity = 0;
+                chart.cursor.lineY.strokeOpacity = 0;
+
+            }); // end am4core.ready()
+        };
+    </script>
+}
