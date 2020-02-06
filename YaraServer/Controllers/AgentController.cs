@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using YaraServer.Data;
+using YaraServer.Hubs;
 using YaraServer.Models;
 using YaraServer.Models.Network;
 using YaraServer.Utils.CertificateHandler;
@@ -20,12 +23,14 @@ namespace YaraServer.Controllers
         private readonly ApplicationDbContext _db;
         private readonly ICertHandler _certHandler;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IHubContext<ScanHub> _hub;
 
-        public AgentController(ApplicationDbContext db, ICertHandler certHandler, IWebHostEnvironment hostingEnvironment)
+        public AgentController(ApplicationDbContext db, ICertHandler certHandler, IWebHostEnvironment hostingEnvironment, IHubContext<ScanHub> hub)
         {
             _db = db;
             _certHandler = certHandler;
             _hostingEnvironment = hostingEnvironment;
+            _hub = hub;
         }
 
         [HttpPost]
@@ -214,6 +219,15 @@ namespace YaraServer.Controllers
                     }
                 }
                 await _db.SaveChangesAsync();
+
+                NotificationMessageModel notificationMessageModel = new NotificationMessageModel()
+                {
+                    Tag = reportModel.Tag,
+                    SystemName = client.SystemName,
+                    OsName = client.OsName,
+                    ReportId = reportModel.Id
+                };
+                await _hub.Clients.All.SendAsync("ReceiveMessage", JsonConvert.SerializeObject(notificationMessageModel));
 
                 return Ok();
             }

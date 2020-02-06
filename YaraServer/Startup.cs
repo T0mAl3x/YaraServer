@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using YaraServer.Utils.CertificateHandler;
+using YaraServer.Hubs;
 
 namespace YaraServer
 {
@@ -36,6 +37,7 @@ namespace YaraServer
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,12 +58,12 @@ namespace YaraServer
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ScanHub>("/scanhub");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}");
